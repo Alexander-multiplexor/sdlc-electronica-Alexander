@@ -1,4 +1,5 @@
 import pytest
+
 from semana1.uart_driver.parsers import ModbusParser, NMEAParser
 
 # =====================================================================

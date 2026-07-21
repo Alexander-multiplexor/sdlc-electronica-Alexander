@@ -1,5 +1,7 @@
 import json
+
 from semana1.uart_driver.recorder import DataRecorder
+
 
 def test_recorder_escribe_json_line_exitoso(tmp_path):
     """Test 1: Verifica que se guarde un registro correctamente en formato JSON-lines."""

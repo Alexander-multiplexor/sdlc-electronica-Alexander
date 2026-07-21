@@ -1,5 +1,5 @@
 import pytest
-from src.sensor_registry import SensorRegistry, SensorNotFoundError
+from src.sensor_registry import SensorNotFoundError, SensorRegistry
 
 
 def test_get_unknown_sensor_raises():

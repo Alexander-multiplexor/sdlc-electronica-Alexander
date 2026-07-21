@@ -1,5 +1,6 @@
 from semana1.fsm_demo import TrafficLightFSM, TrafficLightState
 
+
 def test_estado_inicial():
     """Test 1: Verifica que el estado inicial sea RED."""
     fsm = TrafficLightFSM()

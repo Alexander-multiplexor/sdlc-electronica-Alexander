@@ -1,7 +1,9 @@
 import pytest
+
 from semana1.uart_driver.config import UartConfig
-from semana1.uart_driver.parsers import ModbusParser
 from semana1.uart_driver.device import UartDevice
+from semana1.uart_driver.parsers import ModbusParser
+
 
 def test_device_conexion_y_desconexion():
     """Test 1: Verifica el control de los estados físicos de conexión[cite: 1]."""

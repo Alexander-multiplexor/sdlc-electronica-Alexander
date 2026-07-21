@@ -1,5 +1,6 @@
-from typing import Protocol, List, runtime_checkable
 from dataclasses import dataclass
+from typing import Protocol, runtime_checkable
+
 
 @dataclass(frozen=True)
 class SensorReading:
@@ -50,7 +51,7 @@ class DataRepository(Protocol):
     """Interfaz abstracta del repositorio de datos."""
     def save(self, reading: SensorReading) -> None:
         ...
-    def get_all(self) -> List[SensorReading]:
+    def get_all(self) -> list[SensorReading]:
         ...
 
 class DataProcessor:

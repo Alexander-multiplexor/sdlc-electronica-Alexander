@@ -1,4 +1,4 @@
-from typing import Dict, Any
+from typing import Any
 
 
 class SensorNotFoundError(Exception):
@@ -8,7 +8,7 @@ class SensorNotFoundError(Exception):
 
 class SensorRegistry:
     def __init__(self) -> None:
-        self._sensors: Dict[str, Dict[str, Any]] = {}
+        self._sensors: dict[str, dict[str, Any]] = {}
 
     def register(self, sensor_id: str, sensor_type: str, location: str) -> None:
         self._sensors[sensor_id] = {
@@ -18,7 +18,7 @@ class SensorRegistry:
             "status": "ACTIVO"
         }
 
-    def get(self, sensor_id: str) -> Dict[str, Any]:
+    def get(self, sensor_id: str) -> dict[str, Any]:
         if sensor_id not in self._sensors:
             raise SensorNotFoundError(f"El sensor '{sensor_id}' no existe.")
         return self._sensors[sensor_id]

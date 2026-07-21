@@ -1,6 +1,9 @@
-import pytest
 from dataclasses import FrozenInstanceError
+
+import pytest
+
 from semana1.uart_driver.config import UartConfig
+
 
 def test_config_creacion_exitosa():
     """Test 1: Verifica que se cree correctamente con datos válidos."""
