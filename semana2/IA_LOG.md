@@ -1,0 +1,4 @@
+## [2026-07-21] — Auditoría de Criterios Gherkin (US-01 a US-03)
+* **Prompt enviado:** "Actúa como QA Lead riguroso. Revisa mis criterios de aceptación en Gherkin para la US-02 de sensores IoT. Busca ambigüedades, falta de especificidad o casos borde no contemplados."
+* **Sugerencia de la IA:** La IA señaló que la historia inicial no especificaba qué ocurre si la temperatura leída está fuera de los rangos físicos razonables (p. ej., lecturas aberrantes por fallo de hardware).
+* **Decisión tomada:** **Aceptada.** Se añadió el escenario `Rechazar lectura fuera del rango físico de operación` especificando el comportamiento esperado ante datos fuera de rango.
