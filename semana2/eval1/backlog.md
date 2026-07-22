@@ -53,37 +53,77 @@ Escenario: Emitir alerta a múltiples canales activos
 ```
 
 ## US-04: Persistencia de lecturas en formato JSON-lines
-**MoSCoW:** Should Have | Story Points: 3
+**MoSCoW:** Should Have | **Story Points:** 3
 
-```gherkin: Al recibir una lectura válida, el sistema la apenda como una nueva línea JSON en readings.jsonl.
-```
+Escenario: Guardar lectura válida en archivo JSONL
+  Dado un archivo de registro "readings.jsonl"
+  Cuando el sistema recibe una lectura válida del sensor "TEMP-01"
+  Entonces apenda una nueva línea en formato JSON con la lectura y timestamp actual
 
 ## US-05: Configuración dinámica de umbrales sin reiniciar
-**MoSCoW:** Should Have | Story Points: 2
+**MoSCoW:** Should Have | **Story Points:** 2
 
-```gherkin: Al actualizar los umbrales del detector en tiempo de ejecución, las lecturas subsecuentes se evalúan contra los nuevos valores.
-```
+Escenario: Actualizar umbral de temperatura en tiempo de ejecución
+  Dado un AnomalyDetector configurado inicialmente a 35.0 °C
+  Cuando se actualiza el umbral máximo de temperatura a 30.0 °C
+  Entonces una lectura posterior de 32.0 °C es evaluada como "TEMPERATURA_ALTA"
 
 ## US-06: Simulación de lote de 10 sensores con distribución gaussiana
-**MoSCoW:** Could Have | Story Points: 8
+**MoSCoW:** Could Have | **Story Points:** 8
 
-```gherkin: El generador emite tramas para 10 sensores durante 60 ciclos con variaciones estocásticas gaussianas.
-```
+Escenario: Generar ciclo completo para flota de sensores
+  Dado un SensorSimulator configurado con 10 sensores
+  Cuando se solicita la generación de un ciclo de monitoreo
+  Entonces devuelve una lista de 10 objetos SensorReading con valores estocásticos gaussianos
 
 ## US-07: Verificación de estado de salud de sensores (Heartbeat)
-**MoSCoW:** Should Have | Story Points: 3
+**MoSCoW:** Should Have | **Story Points:** 3
 
-```gherkin: Si un sensor no envía lecturas por más de 60 segundos, se marca como "INACTIVO".
-```
+Escenario: Marcar sensor como inactivo por falta de reporte
+  Dado un sensor "TEMP-01" cuya última lectura fue hace 65 segundos
+  Cuando el monitor de salud ejecuta la verificación
+  Entonces el estado del sensor "TEMP-01" cambia a "INACTIVO"
 
 ## US-08: Filtrado de picos de ruido por hardware
-**MoSCoW:** Could Have | Story Points: 5
+**MoSCoW:** Could Have | **Story Points:** 5
 
-```gherkin: Si una lectura cambia más de 20 °C en 30 segundos respecto a la anterior, se marca como "RUIDO" y se ignora.
-```
+Escenario: Descartar lectura por cambio térmico abrupto
+  Dado que la última lectura del sensor "TEMP-01" fue de 20.0 °C
+  Cuando recibe una nueva lectura de 45.0 °C enviada 10 segundos después
+  Entonces la lectura es marcada como "RUIDO" y no se envía a procesamiento
 
 ## US-09: Generación de reporte diario de anomalías
-**MoSCoW:** Won't Have (este Sprint) | Story Points: 5
+**Como** gerente de operaciones de la bodega,  
+**quiero** recibir un reporte diario consolidado con el resumen de todas las anomalías detectadas en las últimas 24 horas,  
+**para** evaluar el desempeño térmico de las instalaciones y tomar decisiones preventivas.  
+* **Prioridad MoSCoW:** Won't Have (este Sprint)  
+* **Story Points:** 5  
+
+Escenario: Generar reporte diario con anomalías acumuladas
+  Dado un historial de lecturas registradas durante las últimas 24 horas con 3 anomalías
+  Cuando el sistema ejecuta el proceso batch de medianoche
+  Entonces genera un archivo de reporte con el conteo de incidencias agrupadas por sensor
+
+Escenario: Generar reporte en un día sin incidencias
+  Dado que en las últimas 24 horas no se registró ninguna anomalía
+  Cuando se ejecuta la generación del reporte diario
+  Entonces el reporte se crea indicando el estado "Sin incidencias registradas"
+
+---
 
 ## US-10: Dashboard gráfico web de monitoreo en tiempo real
-**MoSCoW:** Won't Have (este Sprint) | Story Points: 13
+**Como** operador de planta,  
+**quiero** visualizar en una interfaz web los valores de los 10 sensores con gráficas en tiempo real,  
+**para** monitorear visualmente la bodega sin necesidad de consultar archivos de texto o consola.  
+* **Prioridad MoSCoW:** Won't Have (este Sprint)  
+* **Story Points:** 13  
+
+Escenario: Actualización en tiempo real de indicadores
+  Dado que el operador tiene abierto el Dashboard web en su navegador
+  Cuando el sensor "TEMP-01" envía una nueva lectura de 24.5 °C
+  Then la tarjeta del sensor "TEMP-01" en la pantalla actualiza su valor en menos de 1 segundo
+
+Escenario: Alerta visual por anomalía detectada
+  Dado un sensor "TEMP-02" que registra una temperatura de 37.0 °C (anomalía)
+  Cuando la lectura llega al Dashboard web
+  Entonces la tarjeta del sensor "TEMP-02" cambia su indicador a color rojo y emite un aviso visual
