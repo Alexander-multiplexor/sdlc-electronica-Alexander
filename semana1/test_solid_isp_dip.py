@@ -1,8 +1,11 @@
-import pytest
 from semana1.solid_isp_dip import (
-    Readable, BasicTemperatureSensor,
-    DataRepository, DataProcessor, SensorReading
+    BasicTemperatureSensor,
+    DataProcessor,
+    DataRepository,
+    Readable,
+    SensorReading,
 )
+
 
 # =====================================================================
 # TESTS: ISP

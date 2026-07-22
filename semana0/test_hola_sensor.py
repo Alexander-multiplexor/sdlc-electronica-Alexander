@@ -1,5 +1,6 @@
 from hola_sensor import Sensor
 
+
 def test_read_devuelve_valor_correcto():
     # 1. Preparar (Arrange): Instanciar la clase Sensor
     mi_sensor = Sensor()

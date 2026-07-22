@@ -1,6 +1,8 @@
-from typing import Any, Dict
+from typing import Any
+
 from semana1.uart_driver.config import UartConfig
 from semana1.uart_driver.parsers import MessageParser
+
 
 class UartDevice:
     """Dispositivo UART central que demuestra el Principio de Inversión de Dependencias (DIP)."""
@@ -23,7 +25,7 @@ class UartDevice:
         """Simula el cierre del puerto serial y liberación del bus."""
         self._connected = False
 
-    def read_and_parse(self, raw_data: bytes) -> Dict[str, Any]:
+    def read_and_parse(self, raw_data: bytes) -> dict[str, Any]:
         """Lee una trama cruda del buffer y delega el procesamiento al parser inyectado."""
         if not self._connected:
             raise RuntimeError("Error de E/S: El dispositivo UART no está conectado.")

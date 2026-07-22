@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
-from typing import Any, Dict
+from typing import Any
+
 
 class MessageParser(ABC):
     """Clase Abstracta Base (ABC) que define el contrato para cualquier protocolo UART."""
@@ -10,7 +11,7 @@ class MessageParser(ABC):
         pass
 
     @abstractmethod
-    def parse(self, data: bytes) -> Dict[str, Any]:
+    def parse(self, data: bytes) -> dict[str, Any]:
         """Decodifica la trama de bytes y extrae la información en un diccionario."""
         pass
 
@@ -23,7 +24,7 @@ class ModbusParser(MessageParser):
         # Para esta simulación, asumimos que si no es NMEA y tiene tamaño válido, la evaluamos
         return len(data) >= 4 and not data.startswith(b"$")
 
-    def parse(self, data: bytes) -> Dict[str, Any]:
+    def parse(self, data: bytes) -> dict[str, Any]:
         if not self.can_parse(data):
             raise ValueError("Trama inválida o corrupta para el protocolo Modbus RTU.")
         
@@ -48,7 +49,7 @@ class NMEAParser(MessageParser):
         # Las sentencias NMEA siempre inician con el carácter '$' y son cadenas ASCII
         return data.startswith(b"$GPGGA")
 
-    def parse(self, data: bytes) -> Dict[str, Any]:
+    def parse(self, data: bytes) -> dict[str, Any]:
         if not self.can_parse(data):
             raise ValueError("La trama no coincide con una sentencia válida NMEA $GPGGA.")
         
