@@ -8,12 +8,12 @@
 * **Story Points:** 3  
 
 ```gherkin
-Scenario: Lectura válida dentro de rangos operativos
+Escenario: Lectura válida dentro de rangos operativos
   Given un sensor con id "TEMP-01"
   When se registra una temperatura de 24.5 °C y humedad de 50.0%
   Then la lectura se crea exitosamente con estado "OK"
 
-Scenario: Rechazar temperatura fuera de límite físico
+Escenario: Rechazar temperatura fuera de límite físico
   Given un sensor con id "TEMP-02"
   When se registra una temperatura de 150.0 °C
   Then el sistema lanza un ValueError indicando temperatura fuera de rango
@@ -27,12 +27,12 @@ Scenario: Rechazar temperatura fuera de límite físico
 * **Story Points:** 5
 
 ```gherkin
-Scenario: Detectar anomalía por alta temperatura
+Escenario: Detectar anomalía por alta temperatura
   Given un detector configurado con umbrales de 35.0 °C y 80.0%
   When recibe una lectura con temperatura de 36.5 °C y humedad del 50.0%
   Then evalúa la lectura como anomalía por "TEMPERATURA_ALTA"
 
-Scenario: Operación dentro de límites normales
+Escenario: Operación dentro de límites normales
   Given un detector configurado con umbrales de 35.0 °C y 80.0%
   When recibe una lectura con temperatura de 22.0 °C y humedad del 45.0%
   Then evalúa la lectura como "NORMAL"
@@ -46,7 +46,7 @@ Scenario: Operación dentro de límites normales
 * **Story Points:** 5
 
 ```gherkin
-Scenario: Emitir alerta a múltiples canales activos
+Escenario: Emitir alerta a múltiples canales activos
   Given un AlertManager con estrategias "ConsoleAlert" y "FileAlert" registradas
   When se notifica una anomalía "TEMPERATURA_ALTA en TEMP-01"
   Then el mensaje se imprime en consola y se escribe en el archivo de log
