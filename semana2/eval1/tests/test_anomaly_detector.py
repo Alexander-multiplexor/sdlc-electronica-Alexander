@@ -1,5 +1,6 @@
-from semana2.eval1.src.sensor_reading import SensorReading
 from semana2.eval1.src.anomaly_detector import AnomalyDetector
+from semana2.eval1.src.sensor_reading import SensorReading
+
 
 def test_detector_temperatura_alta():
     detector = AnomalyDetector(max_temp=35.0, max_humidity=80.0)

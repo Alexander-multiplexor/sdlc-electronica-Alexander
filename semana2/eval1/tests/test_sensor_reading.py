@@ -1,5 +1,7 @@
 import pytest
+
 from semana2.eval1.src.sensor_reading import SensorReading
+
 
 def test_sensor_reading_creacion_valida():
     reading = SensorReading(sensor_id="TEMP-01", temperature=25.0, humidity=50.0)

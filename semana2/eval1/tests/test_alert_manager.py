@@ -1,5 +1,13 @@
 from pathlib import Path
-from semana2.eval1.src.alert_manager import AlertManager, ConsoleAlertStrategy, FileAlertStrategy
+
+import pytest
+
+from semana2.eval1.src.alert_manager import (
+    AlertManager,
+    ConsoleAlertStrategy,
+    FileAlertStrategy,
+)
+
 
 def test_alert_manager_despacha_a_consola_y_archivo(tmp_path: Path, capsys: pytest.CaptureFixture[str]):
     log_file = tmp_path / "alerts.log"

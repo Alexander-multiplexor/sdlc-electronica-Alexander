@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import List
+
 
 class AlertStrategy(ABC):
     @abstractmethod
@@ -21,7 +21,7 @@ class FileAlertStrategy(AlertStrategy):
 
 class AlertManager:
     def __init__(self) -> None:
-        self._strategies: List[AlertStrategy] = []
+        self._strategies: list[AlertStrategy] = []
 
     def add_strategy(self, strategy: AlertStrategy) -> None:
         self._strategies.append(strategy)

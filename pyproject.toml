@@ -1,12 +1,15 @@
+[tool.ruff]
+line-length = 105
+
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B"]
 ignore = []
 
 [tool.pytest.ini_options]
-pythonpath = ["semana2"]
+pythonpath = [".", "semana2"]
 minversion = "7.0"
-addopts = "--cov=semana2/src --cov-report=term-missing --cov-fail-under=80"
-testpaths = ["semana2/tests"]
+addopts = "--cov=semana2/eval1/src --cov-report=term-missing --cov-fail-under=80"
+testpaths = ["semana2/eval1/tests"]
 
 [tool.mypy]
 python_version = "3.11"
@@ -14,3 +17,4 @@ strict = true
 warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = true
+explicit_package_bases = true
