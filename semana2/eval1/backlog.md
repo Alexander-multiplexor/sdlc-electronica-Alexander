@@ -55,7 +55,7 @@ Escenario: Emitir alerta a múltiples canales activos
 ## US-04: Persistencia de lecturas en formato JSON-lines
 **MoSCoW:** Should Have | **Story Points:** 3
 
-```gherkin
+```gherkin:
 Escenario: Guardar lectura válida en archivo JSONL
   Dado un archivo de registro "readings.jsonl"
   Cuando el sistema recibe una lectura válida del sensor "TEMP-01"
