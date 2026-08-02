@@ -27,15 +27,10 @@ def create_reading(
     db: Session = Depends(get_db),
     service: ReadingService = Depends(get_reading_service),
 ) -> ReadingResponse:
-    """
-    Registra una lectura verificando:
-    1. Que el sensor_id de la URL coincida con la lectura.
-    2. Que la unidad y rango respeten la física real.
-    3. Que el sensor esté registrado y activo.
-    """
-    # Garantiza coherencia entre URL y Body
+    """Registra una nueva lectura validando rango y tipo."""
     reading_in.sensor_id = sensor_id
-    return service.record_reading(db, reading_in)  # type: ignore[return-value]
+    reading = service.record_reading(db, reading_in)
+    return ReadingResponse.model_validate(reading)
 
 
 @router.get(
@@ -58,11 +53,12 @@ def list_readings_for_sensor(
     service: ReadingService = Depends(get_reading_service),
 ) -> Sequence[ReadingResponse]:
     """Obtiene lecturas ordenadas cronológicamente con soporte de filtros temporales."""
-    return service.list_readings_for_sensor(
+    readings = service.list_readings_for_sensor(
         db,
         sensor_id=sensor_id,
         limit=limit,
         offset=offset,
         from_date=from_date,
         to_date=to_date,
-    )  # type: ignore[return-value]
+    )
+    return [ReadingResponse.model_validate(r) for r in readings]

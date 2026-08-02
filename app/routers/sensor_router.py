@@ -26,7 +26,8 @@ def create_sensor(
     service: SensorService = Depends(get_sensor_service),
 ) -> SensorResponse:
     """Registra un nuevo dispositivo en el sistema. Lanza 409 si el sensor_id ya existe."""
-    return service.create_sensor(db, sensor_in)  # type: ignore[return-value]
+    sensor = service.create_sensor(db, sensor_in)
+    return SensorResponse.model_validate(sensor)
 
 
 @router.get(
@@ -42,7 +43,8 @@ def list_sensors(
     service: SensorService = Depends(get_sensor_service),
 ) -> Sequence[SensorResponse]:
     """Obtiene el catálogo de sensores con soporte de limit y offset."""
-    return service.list_sensors(db, limit=limit, offset=offset)  # type: ignore[return-value]
+    sensors = service.list_sensors(db, limit=limit, offset=offset)
+    return [SensorResponse.model_validate(s) for s in sensors]
 
 
 @router.get(
@@ -57,7 +59,8 @@ def get_sensor(
     service: SensorService = Depends(get_sensor_service),
 ) -> SensorResponse:
     """Busca un sensor por su ID único. Lanza 404 si no existe."""
-    return service.get_sensor(db, sensor_id)  # type: ignore[return-value]
+    sensor = service.get_sensor(db, sensor_id)
+    return SensorResponse.model_validate(sensor)
 
 
 @router.patch(
@@ -73,7 +76,8 @@ def update_sensor(
     service: SensorService = Depends(get_sensor_service),
 ) -> SensorResponse:
     """Actualiza campos de un sensor sin tocar los no especificados."""
-    return service.update_sensor(db, sensor_id, sensor_update)  # type: ignore[return-value]
+    updated_sensor = service.update_sensor(db, sensor_id, sensor_update)
+    return SensorResponse.model_validate(updated_sensor)
 
 
 @router.delete(
