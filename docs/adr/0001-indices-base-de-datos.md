@@ -1,6 +1,3 @@
-# sdlc-electronica-Alexander
-Este es mi repositorio público
-
 1. **`sensors.sensor_id` (`index=True`)**:
    * *Por qué*: Las operaciones CRUD y las búsquedas por ID de sensor (`GET /sensors/{sensor_id}`) son las más comunes. Un índice B-Tree reduce la complejidad de búsqueda de $O(N)$ (escaneo completo) a $O(\log N)$.
 2. **`readings.sensor_id` (`index=True`)**:
