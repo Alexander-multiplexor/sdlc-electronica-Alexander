@@ -6,4 +6,4 @@ Este es mi repositorio público
 2. **`readings.sensor_id` (`index=True`)**:
    * *Por qué*: Al consultar lecturas históricas por sensor (`GET /sensors/{sensor_id}/readings`), SQL realiza un filtrado por esta columna. Sin índice, la base de datos tendría que examinar millones de lecturas registradas globalmente.
 3. **`readings.created_at` (`index=True`)**:
-   * *Por qué*: El requerimiento exige **filtrar por rango de fechas** (`?from=...&to=...`) y paginar de manera cronológica[cite: 1, 2]. Indexar la estampa de tiempo permite a la BD realizar ordenamientos y búsquedas por rango de manera eficiente.
+   * *Por qué*: El requerimiento exige **filtrar por rango de fechas** (`?from=...&to=...`) y paginar de manera cronológica. Indexar la estampa de tiempo permite a la BD realizar ordenamientos y búsquedas por rango de manera eficiente.
