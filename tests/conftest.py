@@ -1,12 +1,13 @@
-from typing import Generator
+from collections.abc import Generator
+
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import StaticPool  # <-- 1. Importamos StaticPool
 
-from app.db import Base, get_db
 import app.models.sensor_hub  # <-- 2. Importante: registra los modelos en Base.metadata
+from app.db import Base, get_db
 from app.main import app
 
 # Base de datos SQLite en memoria con StaticPool para compartir la misma BD entre peticiones

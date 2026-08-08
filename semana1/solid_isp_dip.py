@@ -40,7 +40,8 @@ class BasicTemperatureSensor(Readable):
 # 5. DEPENDENCY INVERSION PRINCIPLE (DIP)
 # =====================================================================
 
-# ❌ MAL: El procesador depende directamente de una base de datos de bajo nivel (PostgreSQL). No se puede testear sin la BD real.
+# ❌ MAL: El procesador depende directamente de una base de datos 
+# de bajo nivel (PostgreSQL). No se puede testear sin la BD real.
 class BadDataProcessor:
     def __init__(self) -> None:
         # Acoplamiento duro a una infraestructura específica
