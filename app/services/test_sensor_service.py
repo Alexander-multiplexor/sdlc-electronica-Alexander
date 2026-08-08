@@ -1,11 +1,13 @@
-import pytest
 from unittest.mock import MagicMock
+
+import pytest
 from sqlalchemy.orm import Session
 
-from app.services.sensor_service import SensorService
-from app.schemas.sensor import SensorCreate, SensorUpdate
 from app.models.sensor_hub import SensorModel
+from app.schemas.sensor import SensorCreate, SensorUpdate
 from app.services.exceptions import SensorAlreadyExistsError, SensorNotFoundError
+from app.services.sensor_service import SensorService
+
 
 # ==========================================
 # FIXTURES (Configuración inicial simulada)

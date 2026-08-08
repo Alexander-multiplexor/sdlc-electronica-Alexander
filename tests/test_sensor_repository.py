@@ -1,10 +1,12 @@
-import pytest
 from unittest.mock import MagicMock
+
+import pytest
 from sqlalchemy.orm import Session
 
+from app.models.sensor_hub import SensorModel
 from app.repositories.sensor_repository import SensorRepository
 from app.schemas.sensor import SensorUpdate
-from app.models.sensor_hub import SensorModel
+
 
 # ==========================================
 # FIXTURES
