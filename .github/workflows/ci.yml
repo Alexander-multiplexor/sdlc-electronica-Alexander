@@ -55,7 +55,7 @@ jobs:
           DATABASE_URL: postgresql+psycopg://sensor:secret@localhost:5432/sensorhub_test
         run: |
           alembic upgrade head
-          pytest tests/smoke_test.py
+          pytest tests/smoke_test.py --no-cov
 
       - name: Escaneo de Vulnerabilidades en la imagen (Trivy)
         uses: aquasecurity/trivy-action@master
