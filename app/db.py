@@ -4,12 +4,23 @@ from collections.abc import Generator
 from sqlalchemy import create_engine
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
-# Usamos SQLite para desarrollo local, extensible a PostgreSQL para producción
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./sensorhub.db")
 
-# check_same_thread=False es necesario únicamente para SQLite con FastAPI
+def get_database_url() -> str:
+    """Obtiene y normaliza la URL de la base de datos para SQLite y PostgreSQL."""
+    url = os.getenv("DATABASE_URL", "sqlite:///./sensorhub.db")
+    if url.startswith("postgres://"):
+        return url.replace("postgres://", "postgresql+psycopg://", 1)
+    if url.startswith("postgresql://") and "+psycopg" not in url:
+        return url.replace("postgresql://", "postgresql+psycopg://", 1)
+    return url
+
+
+# Asigna la URL procesada a DATABASE_URL
+DATABASE_URL = get_database_url()
+
+# check_same_thread=False solo se activa si la conexión es SQLite
 engine = create_engine(
-    DATABASE_URL, 
+    DATABASE_URL,
     connect_args={"check_same_thread": False} if "sqlite" in DATABASE_URL else {}
 )
 

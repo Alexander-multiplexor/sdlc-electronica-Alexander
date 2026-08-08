@@ -1,0 +1,82 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test-and-scan:
+    runs-on: ubuntu-latest
+
+    # Servicio de PostgreSQL en GitHub Actions para el Smoke Test
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: sensor
+          POSTGRES_PASSWORD: secret
+          POSTGRES_DB: sensorhub_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v4
+
+      - name: Configurar Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar dependencias
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest pytest-cov ruff mypy httpx
+
+      - name: Linting (Ruff)
+        run: ruff check .
+
+      - name: Chequeo de Tipos (Mypy)
+        run: mypy app --ignore-missing-imports
+
+      - name: Pruebas unitarias y Cobertura (>= 60%)
+        run: pytest --cov=app --cov-fail-under=60
+
+      - name: Smoke Test contra PostgreSQL Service
+        env:
+          DATABASE_URL: postgresql+psycopg://sensor:secret@localhost:5432/sensorhub_test
+        run: |
+          alembic upgrade head
+          pytest tests/smoke_test.py
+
+      - name: Escaneo de Vulnerabilidades en la imagen (Trivy)
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          ignore-unfixed: true
+          format: 'table'
+          severity: 'CRITICAL,HIGH'
+
+  create-issue-on-failure:
+    needs: test-and-scan
+    if: failure() && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Crear Issue si el pipeline en main falla
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: '🚨 Falla en el pipeline de la rama main',
+              body: `El pipeline ha fallado en el commit ${context.sha}. Revisa la pestaña de Actions.`
+            })

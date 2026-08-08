@@ -70,4 +70,4 @@ class NMEAParser(MessageParser):
                 "longitud": componentes[4]          # Valor de longitud
             }
         except Exception as e:
-            raise ValueError(f"Error decodificando sentencia NMEA: {e}")
+            raise ValueError(f"Error decodificando sentencia NMEA: {e}") from e
