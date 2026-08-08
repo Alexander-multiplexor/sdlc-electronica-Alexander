@@ -47,8 +47,8 @@ jobs:
       - name: Chequeo de Tipos (Mypy)
         run: mypy app --ignore-missing-imports
 
-      - name: Pruebas unitarias y Cobertura (>= 60%)
-        run: pytest --cov=app --cov-fail-under=60
+      - name: Pruebas unitarias y Cobertura (>= 80%)
+        run: pytest --cov=app --cov-fail-under=80
 
       - name: Smoke Test contra PostgreSQL Service
         env:
