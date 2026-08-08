@@ -10,7 +10,6 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 
 # 2. DESPUÉS importamos las cosas de "app"
 from app.db import Base, get_database_url
-import app.models.sensor_hub
 
 config = context.config
 config.set_main_option("sqlalchemy.url", get_database_url())
