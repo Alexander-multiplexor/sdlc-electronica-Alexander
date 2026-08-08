@@ -47,15 +47,15 @@ jobs:
       - name: Chequeo de Tipos (Mypy)
         run: mypy app --ignore-missing-imports
 
-      - name: Pruebas unitarias y Cobertura (>= 60%)
-        run: pytest --cov=app --cov-fail-under=60
+      - name: Pruebas unitarias y Cobertura (>= 80%)
+        run: pytest --cov=app --cov-fail-under=80
 
       - name: Smoke Test contra PostgreSQL Service
         env:
           DATABASE_URL: postgresql+psycopg://sensor:secret@localhost:5432/sensorhub_test
         run: |
           alembic upgrade head
-          pytest tests/smoke_test.py
+          pytest tests/smoke_test.py --no-cov
 
       - name: Escaneo de Vulnerabilidades en la imagen (Trivy)
         uses: aquasecurity/trivy-action@master
