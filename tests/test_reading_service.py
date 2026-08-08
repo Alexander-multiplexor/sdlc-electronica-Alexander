@@ -1,6 +1,9 @@
-import pytest
 from unittest.mock import MagicMock, patch
+
+import pytest
+
 from app.services.reading_service import ReadingService
+
 
 @pytest.fixture
 def mock_repo():

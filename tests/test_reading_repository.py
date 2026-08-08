@@ -1,10 +1,11 @@
-import pytest
-from unittest.mock import MagicMock
 from datetime import datetime
+from unittest.mock import MagicMock
+
+import pytest
 from sqlalchemy.orm import Session
+
 from app.repositories.reading_repository import ReadingRepository
-from app.schemas.reading import ReadingCreate
-from app.models.sensor_hub import ReadingModel
+
 
 @pytest.fixture
 def mock_db():
