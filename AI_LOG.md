@@ -43,21 +43,26 @@
 
 ---
 
-## 👥 Ronda 2 de Peer Review: Humano vs. IA
+### 🔍 Peer Review Ronda 2 — Evaluación del PR de Alberto Hernández (@AlbertohdzL)
 
-Se realizó la revisión cruzada del Pull Request asignado aplicando la **Checklist de 10 Puntos de Arquitectura y Calidad**:
+* **Repositorio auditado:** `sdlc-electronica-alberto-hernandez`
+* **Fecha:** 15 de agosto de 2026
 
-### Checklist de 10 Puntos
-1. [x] **SRP:** ¿Cada clase y función tiene una responsabilidad única y delimitada?
-2. [x] **DIP:** ¿La lógica de negocio depende de abstracciones (`Protocol`) en lugar de bases de datos concretas?
-3. [x] **Manejo de Errores:** ¿Se manejan excepciones de dominio específicas sin silenciar errores con `except:` genéricos?
-4. [x] **Tipado Estático:** ¿Todos los parámetros y retornos cuentan con type hints válidos para `mypy`?
-5. [x] **Pureza Funcional:** ¿Las funciones de cálculo y conversión no mutan estado global?
-6. [x] **Seguridad:** ¿Se previenen desbordamientos numéricos y datos no validados en endpoints?
-7. [x] **Testabilidad:** ¿Existen pruebas unitarias para casos normales y casos límite (límites físicos, nulos, vacíos)?
-8. [x] **Asincronía Segura:** ¿Se evita el bloqueo del Event Loop (`asyncio`)?
-9. [x] **Nomenclatura:** ¿El vocabulario de variables y clases refleja con precisión el dominio de sensores y telemetría?
-10. [x] **Monolito Modular:** ¿Se respeta el flujo de dependencias entre routers, services y repositories?
+#### 1. Resumen de la Revisión con Checklist de 10 Puntos
+* **Fortalezas:**
+  * **OCP ejemplar:** La implementación del patrón Strategy en `AnomalyDetector` (`AlertStrategy` con `InMemoryAlertStrategy` y `ConsoleAlertStrategy`) desacopla totalmente la regla de negocio del canal de alerta.
+  * **Validación de física real:** Las conversiones en `conversions.py` protegen contra lecturas por debajo del cero absoluto ($-273.15\text{ }^\circ\text{C}$ / $-459.67\text{ }^\circ\text{F}$) mediante `ValueError`.
+  * **Buenas prácticas de testing:** Pruebas limpias usando `capsys` para validar salidas de terminal y `MagicMock` para verificar llamadas a contratos abstractos.
+
+* **Oportunidades de Mejora (Deuda Técnica detectada):**
+  * **DIP / SRP en `SensorService`:** Se recomienda desacoplar `HTTPException` del servicio creando excepciones de dominio (`SensorNotFoundError`, `SensorAlreadyExistsError`) para que el router las capture.
+  * **Sanitización y Paginación:** Acotar `limit = min(limit, 100)` para evitar cargas masivas de memoria y aplicar `.strip()` a los identificadores.
+
+#### 2. Conclusiones Clave de la Dinámica Humano vs. IA
+
+1. **La IA detecta riesgos de concurrencia sutiles:** La IA identificó la condición de carrera TOCTOU (*Time-of-Check to Time-of-Use*) en la creación de sensores, un detalle de infraestructura que el ojo humano suele pasar por alto al enfocarse en la lógica de negocio.
+2. **El humano evalúa el diseño arquitectónico integral:** Mientras la IA evalúa línea por línea, el criterio humano validó que el patrón Strategy cumpliera con los principios de diseño de software mantenible (OCP/DIP) y no agregara complejidad innecesaria.
+3. **Sinergia para un Code Review profesional:** El checklist estructurado permitió que la auditoría no fuera una simple corrección de estilo, sino un análisis profundo de resiliencia, seguridad y arquitectura limpia.
 
 ---
 
