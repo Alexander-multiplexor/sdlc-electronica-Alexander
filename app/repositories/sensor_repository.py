@@ -15,7 +15,7 @@ class SensorRepository:
             name=sensor_in.name,
             sensor_type=sensor_in.sensor_type.value,
             location=sensor_in.location,
-            is_active=True
+            is_active=True,
         )
         db.add(db_sensor)
         db.commit()
@@ -27,16 +27,12 @@ class SensorRepository:
         stmt = select(SensorModel).where(SensorModel.sensor_id == sensor_id)
         return db.scalar(stmt)
 
-    def list_all(
-        self, db: Session, limit: int = 50, offset: int = 0
-    ) -> Sequence[SensorModel]:
+    def list_all(self, db: Session, limit: int = 50, offset: int = 0) -> Sequence[SensorModel]:
         """Lista todos los sensores con soporte de paginación."""
         stmt = select(SensorModel).offset(offset).limit(limit)
         return db.scalars(stmt).all()
 
-    def update(
-        self, db: Session, sensor_id: str, sensor_update: SensorUpdate
-    ) -> SensorModel | None:
+    def update(self, db: Session, sensor_id: str, sensor_update: SensorUpdate) -> SensorModel | None:
         """Actualiza parcialmente la información de un sensor."""
         db_sensor = self.get_by_sensor_id(db, sensor_id)
         if not db_sensor:

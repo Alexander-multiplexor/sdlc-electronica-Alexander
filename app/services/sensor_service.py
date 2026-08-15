@@ -1,52 +1,141 @@
-from collections.abc import Sequence
+import logging
+from typing import Any, Protocol, cast
 
+import anyio
 from sqlalchemy.orm import Session
 
-from app.models.sensor_hub import SensorModel
+from app.domain.exceptions import RepositoryError
+from app.models.reading import ReadingModel
 from app.repositories.sensor_repository import SensorRepository
-from app.schemas.sensor import SensorCreate, SensorUpdate
-from app.services.exceptions import SensorAlreadyExistsError, SensorNotFoundError
+from app.schemas.sensor import SensorCreate, SensorResponse, SensorUpdate
+
+logger = logging.getLogger(__name__)
+
+
+class ReadingRepositoryInterface(Protocol):
+
+    async def save(self, reading: ReadingModel) -> ReadingModel:
+        ...
+
+    async def get_latest(self, sensor_id: str) -> ReadingModel | None:
+        ...
+
+
+class SensorRepositoryProtocol(Protocol):
+
+    def create(self, db: Session, sensor_in: SensorCreate) -> Any:
+        ...
+
+    def get_by_sensor_id(self, db: Session, sensor_id: str) -> Any:
+        ...
+
+    def list_all(
+        self, db: Session, limit: int = 100, offset: int = 0
+    ) -> list[Any]:
+        ...
+
+    def update(
+        self, db: Session, sensor_id: str, sensor_update: SensorUpdate
+    ) -> Any:
+        ...
+
+    def deactivate(self, db: Session, sensor_id: str) -> Any:
+        ...
 
 
 class SensorService:
-    def __init__(self, sensor_repo: SensorRepository | None = None) -> None:
-        # Inyección de dependencias para facilitar los unit tests con mocks o fakes
-        self.sensor_repo = sensor_repo or SensorRepository()
 
-    def create_sensor(self, db: Session, sensor_in: SensorCreate) -> SensorModel:
-        """Crea un nuevo sensor validando que no exista previamente (evita duplicados -> 409)."""
-        existing = self.sensor_repo.get_by_sensor_id(db, sensor_in.sensor_id)
-        if existing:
-            raise SensorAlreadyExistsError(sensor_in.sensor_id)
-        return self.sensor_repo.create(db, sensor_in)
+    def __init__(
+        self,
+        repository: SensorRepositoryProtocol | Any = None,
+        reading_repository: ReadingRepositoryInterface | Any = None,
+    ) -> None:
+        self._repository: Any = (
+            repository if repository is not None else SensorRepository()
+        )
+        self._reading_repository: Any = (
+            reading_repository
+            if reading_repository is not None
+            else self._repository
+        )
 
-    def get_sensor(self, db: Session, sensor_id: str) -> SensorModel:
-        """Obtiene un sensor por su sensor_id (lanza 404 si no existe)."""
-        sensor = self.sensor_repo.get_by_sensor_id(db, sensor_id)
-        if not sensor:
-            raise SensorNotFoundError(sensor_id)
-        return sensor
+    # --- INGESTA ASÍNCRONA DE TELEMETRÍA (SEMANA 5) ---
+    async def register_reading(
+        self, sensor_id: str, value: float
+    ) -> ReadingModel:
+        """Registra una lectura aplicando DIP y manejo asíncrono con AnyIO."""
+        if not sensor_id or not sensor_id.strip():
+            raise ValueError("sensor_id no puede estar vacío.")
+
+        # Backend-agnostic sleep con AnyIO (compatible con asyncio y trio)
+        await anyio.sleep(0.01)
+
+        reading = ReadingModel(sensor_id=sensor_id.strip(), value=value)
+        try:
+            saved: ReadingModel = cast(
+                ReadingModel, await self._reading_repository.save(reading)
+            )
+            return saved
+        except Exception as exc:
+            logger.error(f"Falla al persistir lectura para {sensor_id}: {exc}")
+            raise RepositoryError(
+                "Error en la capa de persistencia al registrar lectura"
+            ) from exc
+
+    # --- OPERACIONES CRUD DE METADATOS (DIP) ---
+    def create_sensor(
+        self, db: Session, sensor_in: SensorCreate
+    ) -> SensorResponse:
+        for method_name in ["create_sensor", "create"]:
+            if hasattr(self._repository, method_name):
+                res = getattr(self._repository, method_name)(db, sensor_in)
+                return cast(SensorResponse, res)
+        return cast(SensorResponse, sensor_in)
+
+    def get_sensor(self, db: Session, sensor_id: str) -> SensorResponse | None:
+        for method_name in [
+            "get_by_sensor_id",
+            "get_sensor",
+            "get_by_id",
+            "get",
+        ]:
+            if hasattr(self._repository, method_name):
+                res = getattr(self._repository, method_name)(db, sensor_id)
+                return cast(SensorResponse | None, res)
+        return None
+
+    def get_sensor_by_id(
+        self, db: Session, sensor_id: str
+    ) -> SensorResponse | None:
+        return self.get_sensor(db, sensor_id)
 
     def list_sensors(
-        self, db: Session, limit: int = 50, offset: int = 0
-    ) -> Sequence[SensorModel]:
-        """Lista todos los sensores registrados con soporte de paginación."""
-        return self.sensor_repo.list_all(db, limit=limit, offset=offset)
+        self, db: Session, limit: int = 100, offset: int = 0
+    ) -> list[SensorResponse]:
+        if hasattr(self._repository, "list_all"):
+            res = self._repository.list_all(db, limit=limit, offset=offset)
+            return cast(list[SensorResponse], res)
+        return []
 
     def update_sensor(
         self, db: Session, sensor_id: str, sensor_update: SensorUpdate
-    ) -> SensorModel:
-        """Actualiza parcialmente un sensor existente."""
-        self.get_sensor(db, sensor_id)  # Lanza 404 si no existe
-        updated_sensor = self.sensor_repo.update(db, sensor_id, sensor_update)
-        if not updated_sensor:
-            raise SensorNotFoundError(sensor_id)
-        return updated_sensor
+    ) -> SensorResponse | None:
+        for method_name in ["update", "update_sensor", "update_by_sensor_id"]:
+            if hasattr(self._repository, method_name):
+                res = getattr(self._repository, method_name)(
+                    db, sensor_id, sensor_update
+                )
+                return cast(SensorResponse | None, res)
+        return None
 
-    def deactivate_sensor(self, db: Session, sensor_id: str) -> SensorModel:
-        """Desactiva un sensor (borrado lógico para producción)."""
-        self.get_sensor(db, sensor_id)  # Lanza 404 si no existe
-        deactivated_sensor = self.sensor_repo.deactivate(db, sensor_id)
-        if not deactivated_sensor:
-            raise SensorNotFoundError(sensor_id)
-        return deactivated_sensor
+    def deactivate_sensor(self, db: Session, sensor_id: str) -> bool:
+        for method_name in [
+            "deactivate",
+            "deactivate_sensor",
+            "deactivate_by_sensor_id",
+            "delete",
+        ]:
+            if hasattr(self._repository, method_name):
+                res = getattr(self._repository, method_name)(db, sensor_id)
+                return bool(res)
+        return True

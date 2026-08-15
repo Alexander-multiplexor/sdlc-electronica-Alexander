@@ -13,11 +13,11 @@ class SensorType(str, Enum):
 # Esquema base con campos comunes
 class SensorBase(BaseModel):
     sensor_id: str = Field(
-        ..., 
-        min_length=3, 
-        max_length=50, 
+        ...,
+        min_length=3,
+        max_length=50,
         description="Identificador único del sensor (ej. TEMP-01)",
-        examples=["TEMP-01"]
+        examples=["TEMP-01"],
     )
     name: str = Field(..., min_length=2, max_length=100, examples=["Sensor Bodega 1"])
     sensor_type: SensorType = Field(..., description="Tipo de sensor soportado")

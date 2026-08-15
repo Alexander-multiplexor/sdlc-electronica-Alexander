@@ -43,12 +43,8 @@ def list_readings_for_sensor(
     sensor_id: str,
     limit: int = Query(50, ge=1, le=100, description="Límite por página"),
     offset: int = Query(0, ge=0, description="Desplazamiento para paginación"),
-    from_date: datetime | None = Query(
-        None, description="Fecha inicial ISO (ej. 2026-07-01T00:00:00)"
-    ),
-    to_date: datetime | None = Query(
-        None, description="Fecha final ISO (ej. 2026-07-31T23:59:59)"
-    ),
+    from_date: datetime | None = Query(None, description="Fecha inicial ISO (ej. 2026-07-01T00:00:00)"),
+    to_date: datetime | None = Query(None, description="Fecha final ISO (ej. 2026-07-31T23:59:59)"),
     db: Session = Depends(get_db),
     service: ReadingService = Depends(get_reading_service),
 ) -> Sequence[ReadingResponse]:

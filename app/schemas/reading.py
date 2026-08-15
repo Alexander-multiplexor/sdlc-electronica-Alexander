@@ -17,19 +17,19 @@ class SensorPhysicsRule(TypedDict):
 PHYSICAL_LIMITS: dict[SensorType, SensorPhysicsRule] = {
     SensorType.TEMPERATURE: {
         "valid_units": {"C", "F", "K"},
-        "min_val": -50.0,   # °C
-        "max_val": 150.0    # °C
+        "min_val": -50.0,  # °C
+        "max_val": 150.0,  # °C
     },
     SensorType.HUMIDITY: {
         "valid_units": {"%"},
-        "min_val": 0.0,     # % HR
-        "max_val": 100.0    # % HR
+        "min_val": 0.0,  # % HR
+        "max_val": 100.0,  # % HR
     },
     SensorType.PRESSURE: {
         "valid_units": {"hPa", "bar"},
-        "min_val": 300.0,   # hPa
-        "max_val": 1100.0   # hPa
-    }
+        "min_val": 300.0,  # hPa
+        "max_val": 1100.0,  # hPa
+    },
 }
 
 
@@ -43,7 +43,7 @@ class ReadingCreate(BaseModel):
     def validate_physics(self) -> "ReadingCreate":
         """Valida que la unidad sea conocida y el valor esté dentro del rango físico del sensor."""
         rules = PHYSICAL_LIMITS.get(self.sensor_type)
-        
+
         if not rules:
             raise ValueError(f"Tipo de sensor '{self.sensor_type}' no soportado para validación física.")
 

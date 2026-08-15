@@ -6,7 +6,7 @@ from semana1.uart_driver.parsers import MessageParser
 
 class UartDevice:
     """Dispositivo UART central que demuestra el Principio de Inversión de Dependencias (DIP)."""
-    
+
     def __init__(self, config: UartConfig, parser: MessageParser) -> None:
         self._config = config
         self._parser = parser  # Inyección de la abstracción del parser
@@ -29,6 +29,6 @@ class UartDevice:
         """Lee una trama cruda del buffer y delega el procesamiento al parser inyectado."""
         if not self._connected:
             raise RuntimeError("Error de E/S: El dispositivo UART no está conectado.")
-        
+
         # El dispositivo no sabe qué protocolo es, solo invoca la abstracción inyectada
         return self._parser.parse(raw_data)

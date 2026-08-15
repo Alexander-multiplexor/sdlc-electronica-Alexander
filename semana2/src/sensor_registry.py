@@ -3,6 +3,7 @@ from typing import Any
 
 class SensorNotFoundError(Exception):
     """Excepción lanzada cuando un sensor no está registrado."""
+
     pass
 
 
@@ -11,12 +12,7 @@ class SensorRegistry:
         self._sensors: dict[str, dict[str, Any]] = {}
 
     def register(self, sensor_id: str, sensor_type: str, location: str) -> None:
-        self._sensors[sensor_id] = {
-            "id": sensor_id,
-            "type": sensor_type,
-            "location": location,
-            "status": "ACTIVO"
-        }
+        self._sensors[sensor_id] = {"id": sensor_id, "type": sensor_type, "location": location, "status": "ACTIVO"}
 
     def get(self, sensor_id: str) -> dict[str, Any]:
         if sensor_id not in self._sensors:

@@ -1,13 +1,14 @@
-from collections.abc import Sequence
-
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from app.db import get_db
 from app.schemas.sensor import SensorCreate, SensorResponse, SensorUpdate
 from app.services.sensor_service import SensorService
 
-router = APIRouter(prefix="/sensors", tags=["Sensors"])
+router = APIRouter(
+    prefix="/sensors",
+    tags=["sensors"],
+)
 
 
 def get_sensor_service() -> SensorService:
@@ -25,26 +26,35 @@ def create_sensor(
     db: Session = Depends(get_db),
     service: SensorService = Depends(get_sensor_service),
 ) -> SensorResponse:
-    """Registra un nuevo dispositivo en el sistema. Lanza 409 si el sensor_id ya existe."""
-    sensor = service.create_sensor(db, sensor_in)
-    return SensorResponse.model_validate(sensor)
+    """Registra un nuevo dispositivo en el sistema. Lanza 409 si ya existe."""
+    try:
+        return service.create_sensor(db, sensor_in)
+    except HTTPException:
+        raise
+    except Exception as exc:
+        msg = str(exc).lower()
+        if "already exists" in msg or "duplicate" in msg or "unique" in msg:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=f"Sensor {sensor_in.sensor_id} ya existe.",
+            ) from exc
+        raise
 
 
 @router.get(
     "",
     response_model=list[SensorResponse],
     status_code=status.HTTP_200_OK,
-    summary="Listar todos los sensores con paginación",
+    summary="Listar sensores con paginación",
 )
 def list_sensors(
-    limit: int = Query(50, ge=1, le=100, description="Límite de registros por página"),
-    offset: int = Query(0, ge=0, description="Desplazamiento para paginación"),
+    limit: int = Query(100, ge=1, le=500),
+    offset: int = Query(0, ge=0),
     db: Session = Depends(get_db),
     service: SensorService = Depends(get_sensor_service),
-) -> Sequence[SensorResponse]:
-    """Obtiene el catálogo de sensores con soporte de limit y offset."""
-    sensors = service.list_sensors(db, limit=limit, offset=offset)
-    return [SensorResponse.model_validate(s) for s in sensors]
+) -> list[SensorResponse]:
+    """Lista sensores registrados con soporte para paginación."""
+    return service.list_sensors(db, limit=limit, offset=offset)
 
 
 @router.get(
@@ -60,14 +70,19 @@ def get_sensor(
 ) -> SensorResponse:
     """Busca un sensor por su ID único. Lanza 404 si no existe."""
     sensor = service.get_sensor(db, sensor_id)
-    return SensorResponse.model_validate(sensor)
+    if not sensor:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Sensor {sensor_id} no encontrado.",
+        )
+    return sensor
 
 
 @router.patch(
     "/{sensor_id}",
     response_model=SensorResponse,
     status_code=status.HTTP_200_OK,
-    summary="Actualizar parcialmente un sensor",
+    summary="Actualizar un sensor",
 )
 def update_sensor(
     sensor_id: str,
@@ -75,20 +90,31 @@ def update_sensor(
     db: Session = Depends(get_db),
     service: SensorService = Depends(get_sensor_service),
 ) -> SensorResponse:
-    """Actualiza campos de un sensor sin tocar los no especificados."""
-    updated_sensor = service.update_sensor(db, sensor_id, sensor_update)
-    return SensorResponse.model_validate(updated_sensor)
+    """Actualiza parcialmente los datos de un sensor."""
+    sensor = service.update_sensor(db, sensor_id, sensor_update)
+    if not sensor:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Sensor {sensor_id} no encontrado.",
+        )
+    return sensor
 
 
 @router.delete(
     "/{sensor_id}",
     status_code=status.HTTP_204_NO_CONTENT,
-    summary="Desactivar un sensor (Borrado lógico)",
+    summary="Desactivar un sensor",
 )
 def deactivate_sensor(
     sensor_id: str,
     db: Session = Depends(get_db),
     service: SensorService = Depends(get_sensor_service),
 ) -> None:
-    """Desactiva el sensor para mantener integridad referencial histórica."""
-    service.deactivate_sensor(db, sensor_id)
+    """Desactiva un sensor lógicamente."""
+    success = service.deactivate_sensor(db, sensor_id)
+    if not success:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Sensor {sensor_id} no encontrado.",
+        )
+    return None

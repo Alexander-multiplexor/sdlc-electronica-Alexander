@@ -7,9 +7,11 @@ class AlertStrategy(ABC):
     def send(self, message: str) -> None:
         pass
 
+
 class ConsoleAlertStrategy(AlertStrategy):
     def send(self, message: str) -> None:
         print(f"[CONSOLE ALERT] {message}")
+
 
 class FileAlertStrategy(AlertStrategy):
     def __init__(self, file_path: Path) -> None:
@@ -18,6 +20,7 @@ class FileAlertStrategy(AlertStrategy):
     def send(self, message: str) -> None:
         with open(self.file_path, "a", encoding="utf-8") as f:
             f.write(f"{message}\n")
+
 
 class AlertManager:
     def __init__(self) -> None:

@@ -21,6 +21,7 @@ def test_srp_reader_returns_correct_reading():
     assert isinstance(reading, SensorReading)
     assert reading.sensor_id == "TEMP-01"
 
+
 def test_srp_logger_executes_without_errors():
     logger = DataLogger()
     reading = SensorReading("TEMP-01", 24.5)
@@ -36,23 +37,27 @@ def test_srp_logger_executes_without_errors():
 # =====================================================================
 class MockAlert(ConsoleAlert):
     """Clase espía para validar que la estrategia fue llamada sin modificar el detector."""
+
     def __init__(self):
         self.message_sent = None
+
     def send(self, message: str) -> None:
         self.message_sent = message
+
 
 def test_ocp_triggers_alert_when_threshold_exceeded():
     mock_alert = MockAlert()
     detector = AnomalyDetector(alert=mock_alert, threshold=30.0)
-    
+
     # Lectura que supera el límite de 30.0
     detector.check(SensorReading("TEMP-MAX", 35.0))
     assert mock_alert.message_sent == "Anomalía en TEMP-MAX"
 
+
 def test_ocp_does_not_trigger_alert_under_threshold():
     mock_alert = MockAlert()
     detector = AnomalyDetector(alert=mock_alert, threshold=30.0)
-    
+
     # Lectura segura
     detector.check(SensorReading("TEMP-MIN", 20.0))
     assert mock_alert.message_sent is None
@@ -65,6 +70,7 @@ def test_lsp_temperature_sensor_substitution():
     temp_sensor = TemperatureSensor()
     # Debe comportarse de forma idéntica bajo la abstracción BaseSensor
     assert process_sensor(temp_sensor) == 25.3
+
 
 def test_lsp_humidity_sensor_substitution():
     hyd_sensor = HumiditySensor()
