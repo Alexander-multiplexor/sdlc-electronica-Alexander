@@ -1,5 +1,7 @@
 from datetime import datetime, timezone
+
 import pytest
+
 from app.domain.exceptions import RepositoryError
 from app.models.reading import ReadingModel
 from app.services.sensor_service import ReadingRepositoryInterface, SensorService
@@ -31,9 +33,7 @@ async def test_register_reading_success() -> None:
     repo = FakeReadingRepository()
     service = SensorService(repository=repo)
 
-    result = await service.register_reading(
-        sensor_id="TEMP_MODBUS_01", value=24.5
-    )
+    result = await service.register_reading(sensor_id="TEMP_MODBUS_01", value=24.5)
 
     assert result.id == 1
     assert result.sensor_id == "TEMP_MODBUS_01"
@@ -56,9 +56,7 @@ async def test_register_reading_encapsulates_repository_exception() -> None:
     repo = FakeReadingRepository(should_fail=True)
     service = SensorService(repository=repo)
 
-    with pytest.raises(
-        RepositoryError, match="Error en la capa de persistencia"
-    ):
+    with pytest.raises(RepositoryError, match="Error en la capa de persistencia"):
         await service.register_reading(sensor_id="ADC_CH0", value=3.29)
 
 
@@ -68,9 +66,7 @@ async def test_register_reading_negative_and_extreme_floating_point() -> None:
     repo = FakeReadingRepository()
     service = SensorService(repository=repo)
 
-    result = await service.register_reading(
-        sensor_id="TEMP_CRYO", value=-271.15
-    )
+    result = await service.register_reading(sensor_id="TEMP_CRYO", value=-271.15)
     assert result.value == -271.15
 
 

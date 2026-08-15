@@ -11,11 +11,7 @@ from app.schemas.reading import ReadingCreate
 class ReadingRepository:
     def create(self, db: Session, reading_in: ReadingCreate) -> ReadingModel:
         """Registra una lectura individual para un sensor."""
-        db_reading = ReadingModel(
-            sensor_id=reading_in.sensor_id,
-            value=reading_in.value,
-            unit=reading_in.unit
-        )
+        db_reading = ReadingModel(sensor_id=reading_in.sensor_id, value=reading_in.value, unit=reading_in.unit)
         db.add(db_reading)
         db.commit()
         db.refresh(db_reading)
@@ -28,7 +24,7 @@ class ReadingRepository:
         limit: int = 50,
         offset: int = 0,
         from_date: datetime | None = None,
-        to_date: datetime | None = None
+        to_date: datetime | None = None,
     ) -> Sequence[ReadingModel]:
         """Consulta lecturas con paginación y filtro por rango de fechas."""
         stmt = select(ReadingModel).where(ReadingModel.sensor_id == sensor_id)

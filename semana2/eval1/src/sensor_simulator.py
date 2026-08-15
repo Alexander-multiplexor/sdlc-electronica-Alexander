@@ -14,7 +14,7 @@ class SensorSimulator:
         hum_mean: float = 50.0,
         hum_std: float = 15.0,
     ) -> None:
-        self.sensor_ids = [f"SENSOR-{i+1:02d}" for i in range(num_sensors)]
+        self.sensor_ids = [f"SENSOR-{i + 1:02d}" for i in range(num_sensors)]
         self.temp_mean = temp_mean
         self.temp_std = temp_std
         self.hum_mean = hum_mean

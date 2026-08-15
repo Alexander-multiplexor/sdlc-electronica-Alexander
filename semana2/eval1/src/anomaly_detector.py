@@ -1,4 +1,3 @@
-
 from semana2.eval1.src.sensor_reading import SensorReading
 
 

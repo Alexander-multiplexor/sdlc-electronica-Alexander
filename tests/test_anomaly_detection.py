@@ -1,6 +1,7 @@
 """Suite de pruebas unitarias TDD para la feature de detección de anomalías."""
 
 import pytest
+
 from app.features.anomalies import (
     AnomalyDetectionService,
     LogAlertStrategy,
@@ -14,13 +15,9 @@ async def test_no_anomaly_when_within_normal_range() -> None:
     """Verifica que lecturas dentro de los límites no disparen eventos ni alertas."""
     log_strat = LogAlertStrategy()
     service = AnomalyDetectionService(strategies=[log_strat])
-    config = SensorThresholdConfig(
-        sensor_id="TEMP-01", min_value=10.0, max_value=40.0
-    )
+    config = SensorThresholdConfig(sensor_id="TEMP-01", min_value=10.0, max_value=40.0)
 
-    event = await service.evaluate_reading(
-        sensor_id="TEMP-01", value=25.0, config=config
-    )
+    event = await service.evaluate_reading(sensor_id="TEMP-01", value=25.0, config=config)
 
     assert event is None
     assert len(service.get_anomalies()) == 0
@@ -32,13 +29,9 @@ async def test_detects_upper_threshold_anomaly() -> None:
     """Verifica detección de anomalía por superación de límite superior."""
     log_strat = LogAlertStrategy()
     service = AnomalyDetectionService(strategies=[log_strat])
-    config = SensorThresholdConfig(
-        sensor_id="TEMP-01", min_value=10.0, max_value=50.0
-    )
+    config = SensorThresholdConfig(sensor_id="TEMP-01", min_value=10.0, max_value=50.0)
 
-    event = await service.evaluate_reading(
-        sensor_id="TEMP-01", value=58.5, config=config
-    )
+    event = await service.evaluate_reading(sensor_id="TEMP-01", value=58.5, config=config)
 
     assert event is not None
     assert event.sensor_id == "TEMP-01"
@@ -53,13 +46,9 @@ async def test_detects_lower_threshold_anomaly() -> None:
     """Verifica detección de anomalía por estar por debajo del límite inferior."""
     log_strat = LogAlertStrategy()
     service = AnomalyDetectionService(strategies=[log_strat])
-    config = SensorThresholdConfig(
-        sensor_id="PRESS-01", min_value=1.5, max_value=8.0
-    )
+    config = SensorThresholdConfig(sensor_id="PRESS-01", min_value=1.5, max_value=8.0)
 
-    event = await service.evaluate_reading(
-        sensor_id="PRESS-01", value=0.8, config=config
-    )
+    event = await service.evaluate_reading(sensor_id="PRESS-01", value=0.8, config=config)
 
     assert event is not None
     assert event.rule == "MIN_EXCEEDED"
@@ -75,9 +64,7 @@ async def test_ocp_multiple_alert_strategies() -> None:
     service = AnomalyDetectionService(strategies=[log_strat, webhook_strat])
 
     config = SensorThresholdConfig(sensor_id="FLOW-01", max_value=100.0)
-    await service.evaluate_reading(
-        sensor_id="FLOW-01", value=130.0, config=config
-    )
+    await service.evaluate_reading(sensor_id="FLOW-01", value=130.0, config=config)
 
     assert len(log_strat.sent_alerts) == 1
     assert len(webhook_strat.sent_alerts) == 1
@@ -89,7 +76,6 @@ async def test_strategy_failure_resilience() -> None:
     """Verifica que una falla en una estrategia no bloquee a las demás ni al flujo principal."""
 
     class BrokenStrategy:
-
         async def send_alert(self, event) -> bool:
             raise RuntimeError("Falla de conexión al servicio de alerta")
 
@@ -98,9 +84,7 @@ async def test_strategy_failure_resilience() -> None:
     service = AnomalyDetectionService(strategies=[broken, log_strat])
 
     config = SensorThresholdConfig(sensor_id="VIB-01", max_value=10.0)
-    event = await service.evaluate_reading(
-        sensor_id="VIB-01", value=15.0, config=config
-    )
+    event = await service.evaluate_reading(sensor_id="VIB-01", value=15.0, config=config)
 
     assert event is not None
     assert len(log_strat.sent_alerts) == 1

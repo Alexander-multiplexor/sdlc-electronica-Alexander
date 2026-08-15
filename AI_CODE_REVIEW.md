@@ -31,22 +31,16 @@ logger = logging.getLogger(__name__)
 
 
 class ReadingRepositoryInterface(Protocol):
+    async def save(self, reading: ReadingModel) -> ReadingModel: ...
 
-    async def save(self, reading: ReadingModel) -> ReadingModel:
-        ...
-
-    async def get_latest(self, sensor_id: str) -> ReadingModel | None:
-        ...
+    async def get_latest(self, sensor_id: str) -> ReadingModel | None: ...
 
 
 class SensorService:
-
     def __init__(self, repository: ReadingRepositoryInterface) -> None:
         self._repository = repository
 
-    async def register_reading(
-        self, sensor_id: str, value: float
-    ) -> ReadingModel:
+    async def register_reading(self, sensor_id: str, value: float) -> ReadingModel:
         if not sensor_id or not sensor_id.strip():
             raise ValueError("sensor_id no puede estar vacío.")
 
@@ -60,7 +54,5 @@ class SensorService:
         except Exception as exc:
             # H-02: Excepción encapsulada con causa original
             logger.error(f"Falla al persistir lectura para {sensor_id}: {exc}")
-            raise RepositoryError(
-                "Error en la capa de persistencia al registrar lectura"
-            ) from exc
+            raise RepositoryError("Error en la capa de persistencia al registrar lectura") from exc
 ```

@@ -36,6 +36,7 @@ def db_session() -> Generator[Session, None, None]:
 @pytest.fixture(scope="function")
 def client(db_session: Session) -> Generator[TestClient, None, None]:
     """Sobrescribe la dependencia get_db para usar la base de datos de pruebas."""
+
     def override_get_db() -> Generator[Session, None, None]:
         try:
             yield db_session

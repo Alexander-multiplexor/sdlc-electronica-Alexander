@@ -4,7 +4,7 @@ from typing import Any
 
 class DataRecorder:
     """Su única responsabilidad es la persistencia pura de los datos parseados en archivos (SRP)."""
-    
+
     def __init__(self, output_path: str) -> None:
         self._output_path = output_path
 

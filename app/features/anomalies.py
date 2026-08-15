@@ -1,8 +1,8 @@
 """Módulo de detección y notificación de anomalías en telemetría de sensores."""
 
+import logging
 from dataclasses import dataclass
 from datetime import datetime, timezone
-import logging
 from typing import Protocol
 
 logger = logging.getLogger(__name__)
@@ -27,8 +27,7 @@ class SensorThresholdConfig:
 class AlertNotificationStrategy(Protocol):
     """Contrato abstracto para estrategias de notificación de alertas (OCP)."""
 
-    async def send_alert(self, event: AnomalyEvent) -> bool:
-        ...
+    async def send_alert(self, event: AnomalyEvent) -> bool: ...
 
 
 class LogAlertStrategy:
@@ -73,9 +72,7 @@ class AnomalyDetectionService:
         """Permite inyectar dinámicamente nuevas estrategias cumpliendo OCP."""
         self._strategies.append(strategy)
 
-    def get_anomalies(
-        self, sensor_id: str | None = None
-    ) -> list[AnomalyEvent]:
+    def get_anomalies(self, sensor_id: str | None = None) -> list[AnomalyEvent]:
         """Consulta el historial de anomalías registradas."""
         if sensor_id:
             return [a for a in self._registry if a.sensor_id == sensor_id]
@@ -111,8 +108,6 @@ class AnomalyDetectionService:
                 try:
                     await strategy.send_alert(event)
                 except Exception as exc:
-                    logger.error(
-                        f"Falla en notificación con estrategia {strategy.__class__.__name__}: {exc}"
-                    )
+                    logger.error(f"Falla en notificación con estrategia {strategy.__class__.__name__}: {exc}")
 
         return event

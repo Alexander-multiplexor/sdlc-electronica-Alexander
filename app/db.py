@@ -19,16 +19,14 @@ def get_database_url() -> str:
 DATABASE_URL = get_database_url()
 
 # check_same_thread=False solo se activa si la conexión es SQLite
-engine = create_engine(
-    DATABASE_URL,
-    connect_args={"check_same_thread": False} if "sqlite" in DATABASE_URL else {}
-)
+engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False} if "sqlite" in DATABASE_URL else {})
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
 class Base(DeclarativeBase):
     """Clase base tipada para SQLAlchemy 2.x"""
+
     pass
 
 

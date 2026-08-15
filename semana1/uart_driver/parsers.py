@@ -27,18 +27,18 @@ class ModbusParser(MessageParser):
     def parse(self, data: bytes) -> dict[str, Any]:
         if not self.can_parse(data):
             raise ValueError("Trama inválida o corrupta para el protocolo Modbus RTU.")
-        
+
         # Simulación de desempaquetado de bytes (estilo struct de C)
         slave_id = int(data[0])
         function_code = int(data[1])
         # Simulamos la lectura de un registro de sujeción (Holding Register) de un sensor
-        valor_sensor = float(len(data) * 1.5) 
-        
+        valor_sensor = float(len(data) * 1.5)
+
         return {
             "protocolo": "Modbus RTU",
             "slave_id": slave_id,
             "function_code": function_code,
-            "value": valor_sensor
+            "value": valor_sensor,
         }
 
 
@@ -52,22 +52,22 @@ class NMEAParser(MessageParser):
     def parse(self, data: bytes) -> dict[str, Any]:
         if not self.can_parse(data):
             raise ValueError("La trama no coincide con una sentencia válida NMEA $GPGGA.")
-        
+
         try:
             # Convertimos los bytes a string ASCII y removemos saltos de línea
             cadena = data.decode("ascii").strip()
             componentes = cadena.split(",")
-            
+
             # Una sentencia $GPGGA estándar tiene campos separados por comas (ID, Tiempo, Latitud, N/S, Longitud...)
             if len(componentes) < 6:
                 raise ValueError("Sentencia NMEA incompleta.")
-                
+
             return {
                 "protocolo": "NMEA",
-                "tipo": componentes[0],             # $GPGGA
-                "timestamp": componentes[1],        # Hora UTC
-                "latitud": componentes[2],          # Valor de latitud
-                "longitud": componentes[4]          # Valor de longitud
+                "tipo": componentes[0],  # $GPGGA
+                "timestamp": componentes[1],  # Hora UTC
+                "latitud": componentes[2],  # Valor de latitud
+                "longitud": componentes[4],  # Valor de longitud
             }
         except Exception as e:
             raise ValueError(f"Error decodificando sentencia NMEA: {e}") from e

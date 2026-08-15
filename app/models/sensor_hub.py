@@ -19,10 +19,7 @@ class SensorModel(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
 
     # Relación un sensor -> muchas lecturas
-    readings: Mapped[list["ReadingModel"]] = relationship(
-        back_populates="sensor", 
-        cascade="all, delete-orphan"
-    )
+    readings: Mapped[list["ReadingModel"]] = relationship(back_populates="sensor", cascade="all, delete-orphan")
 
 
 class ReadingModel(Base):
@@ -31,10 +28,7 @@ class ReadingModel(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     # Llave foránea que referencia al sensor_id único
     sensor_id: Mapped[str] = mapped_column(
-        String(50), 
-        ForeignKey("sensors.sensor_id", ondelete="CASCADE"), 
-        index=True, 
-        nullable=False
+        String(50), ForeignKey("sensors.sensor_id", ondelete="CASCADE"), index=True, nullable=False
     )
     value: Mapped[float] = mapped_column(Float, nullable=False)
     unit: Mapped[str] = mapped_column(String(20), nullable=False)  # "C", "%", "hPa", etc.

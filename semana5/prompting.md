@@ -57,9 +57,7 @@ def raw_to_calibrated_voltage(
     """
     max_raw = (1 << adc_bits) - 1
     if not (0 <= raw_value <= max_raw):
-        raise ValueError(
-            f"raw_value ({raw_value}) fuera de rango para resolución de {adc_bits} bits [0, {max_raw}]."
-        )
+        raise ValueError(f"raw_value ({raw_value}) fuera de rango para resolución de {adc_bits} bits [0, {max_raw}].")
 
     voltage_ideal = (raw_value / max_raw) * v_ref
     voltage_calibrated = (voltage_ideal * gain) + offset
@@ -109,7 +107,6 @@ class SensorStats:
 
 
 class SQLAlchemyReadingRepository:
-
     def __init__(self, session: AsyncSession) -> None:
         self._session = session
 
@@ -144,6 +141,7 @@ def check_alert(sensor, val):
     if val > sensor.limit:
         print(f"Alerta en {sensor.name}!")
         import requests
+
         requests.post("[https://webhook.site/test](https://webhook.site/test)", json={"alert": val})
 ```
 
@@ -180,13 +178,10 @@ class AnomalyEvent:
 
 
 class AlertNotificationStrategy(Protocol):
-
-    async def notify(self, event: AnomalyEvent) -> bool:
-        ...
+    async def notify(self, event: AnomalyEvent) -> bool: ...
 
 
 class AnomalyEvaluator:
-
     def __init__(self, strategies: list[AlertNotificationStrategy]) -> None:
         self._strategies = strategies
 
@@ -222,9 +217,7 @@ class AnomalyEvaluator:
                 try:
                     await strategy.notify(event)
                 except Exception as exc:
-                    logger.error(
-                        f"Error en notificación de {strategy.__class__.__name__}: {exc}"
-                    )
+                    logger.error(f"Error en notificación de {strategy.__class__.__name__}: {exc}")
 
         return event
 ```

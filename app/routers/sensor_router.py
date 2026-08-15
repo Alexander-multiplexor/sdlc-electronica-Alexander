@@ -1,4 +1,3 @@
-from typing import List
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
@@ -38,13 +37,13 @@ def create_sensor(
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
                 detail=f"Sensor {sensor_in.sensor_id} ya existe.",
-            )
+            ) from exc
         raise
 
 
 @router.get(
     "",
-    response_model=List[SensorResponse],
+    response_model=list[SensorResponse],
     status_code=status.HTTP_200_OK,
     summary="Listar sensores con paginación",
 )
@@ -53,7 +52,7 @@ def list_sensors(
     offset: int = Query(0, ge=0),
     db: Session = Depends(get_db),
     service: SensorService = Depends(get_sensor_service),
-) -> List[SensorResponse]:
+) -> list[SensorResponse]:
     """Lista sensores registrados con soporte para paginación."""
     return service.list_sensors(db, limit=limit, offset=offset)
 

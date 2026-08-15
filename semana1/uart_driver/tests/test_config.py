@@ -13,11 +13,13 @@ def test_config_creacion_exitosa():
     assert config.stop_bits == 1
     assert config.timeout == 2.0
 
+
 def test_config_baudrate_invalido_lanza_excepcion():
     """Test 2: Debe lanzar ValueError si el baudrate no es estándar."""
     with pytest.raises(ValueError) as exc_info:
         UartConfig(baudrate=9999)  # Baudrate inexistente
     assert "no soportado" in str(exc_info.value)
+
 
 def test_config_es_inmutable():
     """Test 3: Al ser frozen, modificar un atributo debe lanzar FrozenInstanceError."""

@@ -25,9 +25,7 @@ def raw_to_calibrated_voltage(
     """
     max_raw = (1 << adc_bits) - 1
     if not (0 <= raw_value <= max_raw):
-        raise ValueError(
-            f"raw_value ({raw_value}) fuera de rango para resolución de {adc_bits} bits [0, {max_raw}]."
-        )
+        raise ValueError(f"raw_value ({raw_value}) fuera de rango para resolución de {adc_bits} bits [0, {max_raw}].")
 
     voltage_ideal = (raw_value / max_raw) * v_ref
     voltage_calibrated = (voltage_ideal * gain) + offset

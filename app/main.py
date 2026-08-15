@@ -25,6 +25,7 @@ app = FastAPI(
 
 # --- MANEJADORES GLOBALES DE EXCEPCIONES DE DOMINIO (HTTP 400, 404, 409) ---
 
+
 @app.exception_handler(SensorNotFoundError)
 def sensor_not_found_handler(request: Request, exc: SensorNotFoundError) -> JSONResponse:
     return JSONResponse(
@@ -34,9 +35,7 @@ def sensor_not_found_handler(request: Request, exc: SensorNotFoundError) -> JSON
 
 
 @app.exception_handler(SensorAlreadyExistsError)
-def sensor_already_exists_handler(
-    request: Request, exc: SensorAlreadyExistsError
-) -> JSONResponse:
+def sensor_already_exists_handler(request: Request, exc: SensorAlreadyExistsError) -> JSONResponse:
     return JSONResponse(
         status_code=status.HTTP_409_CONFLICT,
         content={"detail": str(exc)},
@@ -52,9 +51,7 @@ def sensor_inactive_handler(request: Request, exc: SensorInactiveError) -> JSONR
 
 
 @app.exception_handler(SensorTypeMismatchError)
-def sensor_type_mismatch_handler(
-    request: Request, exc: SensorTypeMismatchError
-) -> JSONResponse:
+def sensor_type_mismatch_handler(request: Request, exc: SensorTypeMismatchError) -> JSONResponse:
     return JSONResponse(
         status_code=status.HTTP_400_BAD_REQUEST,
         content={"detail": str(exc)},

@@ -35,9 +35,7 @@ def test_integration_10_sensors_60_cycles(tmp_path: Path) -> None:
 
             if is_anomaly:
                 anomalies_count += 1
-                alert_manager.notify(
-                    f"Ciclo {cycle+1:02d} | {reading.sensor_id}: {reason}"
-                )
+                alert_manager.notify(f"Ciclo {cycle + 1:02d} | {reading.sensor_id}: {reason}")
 
     # 3. Verificaciones de integración
     assert total_readings == 600
