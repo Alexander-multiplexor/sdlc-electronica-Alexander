@@ -1,7 +1,6 @@
-import asyncio
 import logging
 from typing import Any, Protocol, cast
-
+import anyio
 from sqlalchemy.orm import Session
 
 from app.domain.exceptions import RepositoryError
@@ -21,27 +20,59 @@ class ReadingRepositoryInterface(Protocol):
         ...
 
 
+class SensorRepositoryProtocol(Protocol):
+
+    def create(self, db: Session, sensor_in: SensorCreate) -> Any:
+        ...
+
+    def get_by_sensor_id(self, db: Session, sensor_id: str) -> Any:
+        ...
+
+    def list_all(
+        self, db: Session, limit: int = 100, offset: int = 0
+    ) -> list[Any]:
+        ...
+
+    def update(
+        self, db: Session, sensor_id: str, sensor_update: SensorUpdate
+    ) -> Any:
+        ...
+
+    def deactivate(self, db: Session, sensor_id: str) -> Any:
+        ...
+
+
 class SensorService:
 
-    def __init__(self, repository: Any = None) -> None:
+    def __init__(
+        self,
+        repository: SensorRepositoryProtocol | Any = None,
+        reading_repository: ReadingRepositoryInterface | Any = None,
+    ) -> None:
         self._repository: Any = (
             repository if repository is not None else SensorRepository()
         )
+        self._reading_repository: Any = (
+            reading_repository
+            if reading_repository is not None
+            else self._repository
+        )
 
-    # --- MÉTODOS ASÍNCRONOS Y AUDITADOS (SEMANA 5) ---
+    # --- INGESTA ASÍNCRONA DE TELEMETRÍA (SEMANA 5) ---
     async def register_reading(
         self, sensor_id: str, value: float
     ) -> ReadingModel:
-        """Registra una lectura aplicando DIP y manejo asíncrono."""
+        """Registra una lectura aplicando DIP y manejo asíncrono con AnyIO."""
         if not sensor_id or not sensor_id.strip():
             raise ValueError("sensor_id no puede estar vacío.")
 
-        await asyncio.sleep(0.01)
+        # Backend-agnostic sleep con AnyIO (compatible con asyncio y trio)
+        await anyio.sleep(0.01)
 
         reading = ReadingModel(sensor_id=sensor_id.strip(), value=value)
         try:
             saved: ReadingModel = cast(
-                ReadingModel, await self._repository.save(reading)
+                ReadingModel, await self._reading_repository.save(reading)
             )
             return saved
         except Exception as exc:
@@ -50,7 +81,7 @@ class SensorService:
                 "Error en la capa de persistencia al registrar lectura"
             ) from exc
 
-    # --- MÉTODOS DE COMPATIBILIDAD CON SENSOR_ROUTER ---
+    # --- OPERACIONES CRUD DE METADATOS (DIP) ---
     def create_sensor(
         self, db: Session, sensor_in: SensorCreate
     ) -> SensorResponse:
@@ -108,5 +139,5 @@ class SensorService:
         ]:
             if hasattr(self._repository, method_name):
                 res = getattr(self._repository, method_name)(db, sensor_id)
-                return bool(res)
+                rgit push origin semana-4-devopseturn bool(res)
         return True
