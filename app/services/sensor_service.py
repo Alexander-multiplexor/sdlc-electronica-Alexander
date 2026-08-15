@@ -1,5 +1,6 @@
 import logging
 from typing import Any, Protocol, cast
+
 import anyio
 from sqlalchemy.orm import Session
 
@@ -139,5 +140,5 @@ class SensorService:
         ]:
             if hasattr(self._repository, method_name):
                 res = getattr(self._repository, method_name)(db, sensor_id)
-                rgit push origin semana-4-devopseturn bool(res)
+                return bool(res)
         return True
