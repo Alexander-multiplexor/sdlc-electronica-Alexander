@@ -112,12 +112,9 @@ class SensorService:
     def list_sensors(
         self, db: Session, limit: int = 100, offset: int = 0
     ) -> list[SensorResponse]:
-        for method_name in ["list_all", "list_sensors", "get_all", "list"]:
-            if hasattr(self._repository, method_name):
-                res = getattr(self._repository, method_name)(
-                    db, limit=limit, offset=offset
-                )
-                return cast(list[SensorResponse], res)
+        if hasattr(self._repository, "list_all"):
+            res = self._repository.list_all(db, limit=limit, offset=offset)
+            return cast(list[SensorResponse], res)
         return []
 
     def update_sensor(

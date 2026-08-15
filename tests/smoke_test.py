@@ -1,3 +1,11 @@
-def test_smoke():
-    """Smoke test básico para verificar que el entorno CI de pruebas funcione."""
-    assert True
+from fastapi.testclient import TestClient
+
+from app.main import app
+
+client = TestClient(app)
+
+
+def test_smoke() -> None:
+    """Verifica que el servicio responda correctamente en su endpoint de salud."""
+    response = client.get("/health")
+    assert response.status_code == 200
